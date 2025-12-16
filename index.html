@@ -1,1 +1,172 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+class MenuEscalable:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Menú Escalable de 2 Niveles")
+        self.root.geometry("600x500")
+        self.root.resizable(False, False)
+        
+        # Datos del menú
+        self.gimnasia = ['Recuerdame', 'Acomodame', 'Desafío de colores']
+        self.estrategia = ['Chess', 'Damas Chinas', 'Sopa de letras']
+        self.diversion = ['Lectura', 'Filosofía', 'Programación']
+        self.Juegos = ['Gimnasia Cerebral', 'Estrategia', 'Solo por Diversión']
+        self.juegos = {
+            'Gimnasia Cerebral': self.gimnasia,
+            'Estrategia': self.estrategia,
+            'Solo por Diversión': self.diversion
+        }
+        
+        self.Matematicas = ['Probabilidad', 'Analisis de Datos', 'IA']
+        self.Dockers = ['Docker_01', 'Docker_02', 'Docker_03']
+        self.Fisica = ['Mecánica', 'Termodinámica', 'Quántica']
+        
+        self.categosnom = ['Juegos', 'Matematicas', 'Dockers', 'Física']
+        self.categos = [self.Juegos, self.Matematicas, self.Dockers, self.Fisica]
+        
+        self.opcion_seleccionada = None
+        self.subopcion_seleccionada = None
+        
+        self.crear_interfaz()
+    
+    def crear_interfaz(self):
+        # Frame principal
+        main_frame = tk.Frame(self.root, bg='#f0f0f0')
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        # Título
+        titulo = tk.Label(
+            main_frame,
+            text="BIENVENIDOS\nOPCIONES DISPONIBLES",
+            font=('Arial', 16, 'bold'),
+            bg='#f0f0f0',
+            fg='#2c3e50'
+        )
+        titulo.pack(pady=(0, 20))
+        
+        # Frame para categorías principales
+        self.frame_categorias = tk.Frame(main_frame, bg='#f0f0f0')
+        self.frame_categorias.pack(fill=tk.BOTH, expand=True)
+        
+        # Crear botones de categorías
+        for i, categoria in enumerate(self.categosnom):
+            btn = tk.Button(
+                self.frame_categorias,
+                text=f"{i+1}. {categoria}",
+                font=('Arial', 12),
+                bg='#3498db',
+                fg='white',
+                activebackground='#2980b9',
+                cursor='hand2',
+                width=30,
+                height=2,
+                command=lambda idx=i: self.seleccionar_categoria(idx)
+            )
+            btn.pack(pady=5)
+        
+        # Frame para subcategorías (inicialmente oculto)
+        self.frame_subcategorias = tk.Frame(main_frame, bg='#ecf0f1')
+        
+        # Label para mostrar categoría seleccionada
+        self.label_categoria = tk.Label(
+            self.frame_subcategorias,
+            text="",
+            font=('Arial', 12, 'bold'),
+            bg='#ecf0f1',
+            fg='#2c3e50'
+        )
+        self.label_categoria.pack(pady=10)
+        
+        # Frame interior para botones de subcategorías
+        self.frame_botones_sub = tk.Frame(self.frame_subcategorias, bg='#ecf0f1')
+        self.frame_botones_sub.pack(fill=tk.BOTH, expand=True)
+        
+        # Botón volver
+        btn_volver = tk.Button(
+            self.frame_subcategorias,
+            text="← Volver",
+            font=('Arial', 10),
+            bg='#95a5a6',
+            fg='white',
+            cursor='hand2',
+            command=self.volver_categorias
+        )
+        btn_volver.pack(pady=10)
+    
+    def seleccionar_categoria(self, idx):
+        self.opcion_seleccionada = idx
+        categoria = self.categosnom[idx]
+        subcategorias = self.categos[idx]
+        
+        # Ocultar categorías principales
+        self.frame_categorias.pack_forget()
+        
+        # Mostrar subcategorías
+        self.frame_subcategorias.pack(fill=tk.BOTH, expand=True)
+        self.label_categoria.config(
+            text=f"Seleccionaste: {categoria}\nElementos disponibles:"
+        )
+        
+        # Limpiar botones anteriores
+        for widget in self.frame_botones_sub.winfo_children():
+            widget.destroy()
+        
+        # Crear botones de subcategorías
+        for i, subcat in enumerate(subcategorias):
+            btn = tk.Button(
+                self.frame_botones_sub,
+                text=f"{i+1}. {subcat}",
+                font=('Arial', 11),
+                bg='#2ecc71',
+                fg='white',
+                activebackground='#27ae60',
+                cursor='hand2',
+                width=35,
+                height=2,
+                command=lambda idx=i, sub=subcat: self.seleccionar_subcategoria(idx, sub)
+            )
+            btn.pack(pady=5)
+    
+    def seleccionar_subcategoria(self, idx, subcategoria):
+        self.subopcion_seleccionada = idx
+        
+        # Verificar si la categoría principal es "Juegos" y tiene sub-elementos
+        if self.categosnom[self.opcion_seleccionada] == 'Juegos':
+            if subcategoria in self.juegos:
+                elementos = self.juegos[subcategoria]
+                mensaje = f"Categoría: {self.categosnom[self.opcion_seleccionada]}\n"
+                mensaje += f"Subcategoría: {subcategoria}\n\n"
+                mensaje += "Elementos:\n"
+                for elem in elementos:
+                    mensaje += f"• {elem}\n"
+                messagebox.showinfo("Selección Final", mensaje)
+            else:
+                messagebox.showinfo(
+                    "Selección",
+                    f"Has seleccionado:\n{subcategoria}"
+                )
+        else:
+            messagebox.showinfo(
+                "Selección",
+                f"Categoría: {self.categosnom[self.opcion_seleccionada]}\n"
+                f"Subcategoría: {subcategoria}"
+            )
+    
+    def volver_categorias(self):
+        # Ocultar subcategorías
+        self.frame_subcategorias.pack_forget()
+        
+        # Mostrar categorías principales
+        self.frame_categorias.pack(fill=tk.BOTH, expand=True)
+        
+        self.opcion_seleccionada = None
+        self.subopcion_seleccionada = None
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = MenuEscalable(root)
+    root.mainloop()
+
 
